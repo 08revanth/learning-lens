@@ -1,19 +1,68 @@
 importScripts('config.js');
-// This is the listener for messages from the content script
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  // Check if the message contains the text we're looking for
+  
   if (request.text) {
-    // Call the Gemini API
     getGeminiDefinition(request.text);
   }
 });
+function updatePopup(historyItem) {
+  const definitionContainer = document.getElementById('definition-container');
+  if (historyItem && historyItem.definition) {
+    typewriterEffect(definitionContainer, historyItem.definition);
+  }
+}
 
-// The function that makes the API call
+function updateHistoryList(history) {
+  const historyList = document.getElementById('history-list');
+  historyList.innerHTML = ''; 
+  
+  for (let i = 1; i < history.length; i++) {
+    const item = history[i];
+    const listItem = document.createElement('li');
+    listItem.textContent = item.term;
+    listItem.title = item.definition; // Show full definition on hover
+    historyList.appendChild(listItem);
+  }
+}
+
+function typewriterEffect(element, text, speed = 20) {
+  let i = 0;
+  element.innerHTML = "";
+  element.style.cursor = 'wait';
+
+  const timer = setInterval(() => {
+    if (i < text.length) {
+      element.innerHTML += text.charAt(i);
+      i++;
+    } else {
+      clearInterval(timer);
+      element.style.cursor = 'default';
+    }
+  }, speed);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  chrome.storage.local.get({ history: [] }, (result) => {
+    const history = result.history;
+    if (history.length > 0) {
+      updatePopup(history[0]); 
+      updateHistoryList(history); 
+    }
+  });
+});
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.newDefinition) {
+    chrome.storage.local.get({ history: [] }, (result) => {
+       const history = result.history;
+       updatePopup(history[0]);
+       updateHistoryList(history);
+    });
+  }
+});
+
 async function getGeminiDefinition(selectedText) {
-  // !!! IMPORTANT: Make sure your actual API key is here
- // const API_KEY = ' '; 
-
-  // CORRECTED: Using the stable and current model endpoint
   const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
 
   const prompt = `Explain the concept "${selectedText}" in a clear and concise way for a browser extension. Limit the response to 2-3 sentences.`;
@@ -30,7 +79,7 @@ async function getGeminiDefinition(selectedText) {
     });
 
     if (!response.ok) {
-      // This will catch other errors like 400 or 500
+    
       const errorBody = await response.text();
       throw new Error(`HTTP error! status: ${response.status}, body: ${errorBody}`);
     }
