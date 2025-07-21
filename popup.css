@@ -1,0 +1,44 @@
+/* Import a futuristic font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+/* General styles for the popup body */
+body {
+  width: 320px;
+  padding: 20px;
+  font-family: 'Orbitron', sans-serif;
+  /* UPDATED: Solid dark theme background to match */
+  background: #181818; 
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+/* Styles for the main title */
+h2 {
+  font-size: 22px;
+  margin-top: 0;
+  text-align: center;
+  font-weight: 700;
+  background: -webkit-linear-gradient(left, #4285F4, #EA4335, #FBBC05, #34A853);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Styles for the container holding the definition */
+#definition-container {
+  margin-top: 20px;
+  font-size: 14px;
+  font-family: "Segoe UI", Roboto, sans-serif;
+  line-height: 1.6;
+  color: #c7c7c7;
+}
+
+/* Definition for the fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

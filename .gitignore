@@ -1,0 +1,4 @@
+config.js
+
+# Ignore system files
+.DS_Store
